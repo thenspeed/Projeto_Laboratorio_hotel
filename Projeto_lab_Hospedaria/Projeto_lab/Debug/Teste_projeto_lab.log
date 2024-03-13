@@ -1,0 +1,4 @@
+﻿Debug\menu.obj : warning LNK4042: objeto especificado mais de uma vez; extras ignorados
+main.obj : error LNK2019: símbolo externo não resolvido, _exibirMenu, referenciado na função _main
+main.obj : error LNK2019: símbolo externo não resolvido, _executarOpcao, referenciado na função _main
+C:\Users\Daniel Vieira Soares\OneDrive\Documentos\Teste_projeto_lab\Debug\Teste_projeto_lab.exe : fatal error LNK1120: 2 externo não resolvidos

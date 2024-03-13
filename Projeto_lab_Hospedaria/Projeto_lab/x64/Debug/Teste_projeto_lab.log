@@ -1,0 +1,3 @@
+﻿  reserva.c
+C:\Users\Daniel Vieira Soares\OneDrive\Documentos\Teste_projeto_lab\Teste_projeto_lab\reserva.c(64,5): warning C4013: 'limparTela' indefinido; assumindo extern retornando int
+  Teste_projeto_lab.vcxproj -> C:\Users\Daniel Vieira Soares\OneDrive\Documentos\Teste_projeto_lab\x64\Debug\Teste_projeto_lab.exe
