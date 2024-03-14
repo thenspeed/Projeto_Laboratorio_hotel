@@ -140,15 +140,10 @@ int cadastrarReserva() {
         return 0;
     }
     printf(" \n");
-    printf("Identificacao da reserva (maior que 0): ");
-    scanf("%d", &reserva.identificacaoReserva);
-
-    // Validando identificacao da reserva maior que 0
-    if (reserva.identificacaoReserva <= 0) {
-        printf("A identificacao da reserva deve ser maior que 0.\n");
-        fclose(arquivo);
-        return 0;
-    }
+   
+    // Gerar identificação de reserva aleatória
+    srand(time(NULL)); // Semente para a função rand()
+    reserva.identificacaoReserva = rand() % 1000000 + 1; // Número aleatório entre 1 e 999999
 
     printf("CPF do cliente (13 caracteres): ");
     scanf("%13s", reserva.cpfCliente);
@@ -190,6 +185,7 @@ int cadastrarReserva() {
 
     limparTela();
     imprimirTextoCercado("Cadastro da reserva concluido!", strlen("Cadastro da reserva concluido!"));
+    printf("Identificacao da reserva: %d\n", reserva.identificacaoReserva);
 
     return 1;
 }
