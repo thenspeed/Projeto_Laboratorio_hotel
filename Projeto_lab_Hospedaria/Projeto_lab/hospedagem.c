@@ -38,11 +38,11 @@ void iniciarHospedagem(int codigoReserva) {
     Reserva reserva;
     Hospedagem novaHospedagem;
 
-    arquivoReservas = fopen("Reservas.txt", "r");
-    arquivoHospedagens = fopen("Hospedagens.txt", "a");
+    arquivoReservas = fopen("Reservas.csv", "r");
+    arquivoHospedagens = fopen("Hospedagens.csv", "a");
 
     if (arquivoReservas == NULL || arquivoHospedagens == NULL) {
-        printf("Erro ao abrir os arquivos Reservas.txt ou Hospedagens.txt\n");
+        printf("Erro ao abrir os arquivos Reservas.csv ou Hospedagens.csv\n");
         return;
     }
 
@@ -77,10 +77,13 @@ void iniciarHospedagem(int codigoReserva) {
                 novaHospedagem.status, novaHospedagem.valorTotal);
 
             // Atualiza o status da reserva para "Ativa"
-      
+
 
             // Exibe mensagem de sucesso
-            printf("Hospedagem iniciada com sucesso!\n");
+            limparTela();
+            imprimirTextoCercado("Hospedagem iniciada com sucesso!", strlen("Hospedagem iniciada com sucesso!"));
+
+
         }
     }
 
@@ -92,16 +95,15 @@ void iniciarHospedagem(int codigoReserva) {
     }
 }
 
-
-// Função para finalizar hospedagem 
 void finalizarHospedagem(int codigoReserva) {
     FILE* arquivoHospedagens;
     Hospedagem hospedagem;
+    Quarto quarto;
 
-    arquivoHospedagens = fopen("Hospedagens.txt", "r+");
+    arquivoHospedagens = fopen("Hospedagens.csv", "r+");
 
     if (arquivoHospedagens == NULL) {
-        printf("Erro ao abrir o arquivo Hospedagens.txt\n");
+        printf("Erro ao abrir o arquivo Hospedagens.csv\n");
         return;
     }
 
@@ -116,28 +118,69 @@ void finalizarHospedagem(int codigoReserva) {
         if (hospedagem.identificacaoReserva == codigoReserva && strcmp(hospedagem.status, "Ativa") == 0) {
             hospedagemEncontrada = 1;
 
-            // Atualiza a data de check-out
-            printf("Digite a data de check-out (dia mes ano): ");
-            scanf("%d %d %d", &hospedagem.checkOutDia, &hospedagem.checkOutMes, &hospedagem.checkOutAno);
+            // Obtém o preço do quarto
+            FILE* arquivoQuartos;
+            arquivoQuartos = fopen("Quartos.csv", "r");
+            if (arquivoQuartos == NULL) {
+                printf("Erro ao abrir o arquivo Quartos.csv\n");
+                fclose(arquivoHospedagens);
+                return;
+            }
 
-            double valorQuarto = 100.0;
-            hospedagem.valorTotal = valorQuarto;
+            while (fscanf(arquivoQuartos, "%d;%d;%d;%[^;];%lf;%c\n",
+                &quarto.identificacao, &quarto.camasSolteiro, &quarto.camasCasal,
+                quarto.tipo, &quarto.precoDiaria, &quarto.status) == 6) {
+                if (quarto.identificacao == hospedagem.identificacaoReserva) {
+                    // Calcula a diferença de tempo em dias
+                    double duracao;
+                    int year = hospedagem.checkOutAno;
+                    if (year >= 1900) {
+                        year -= 1900;
+                    }
+                    else {
+                        // Trate o caso de ano inválido conforme necessário
+                    }
+                    time_t checkIn = mktime(&((struct tm) { hospedagem.checkInAno - 1900, hospedagem.checkInMes - 1, hospedagem.checkInDia, 0, 0, 0, 0, 0, 0 }));
+                    time_t checkOut = mktime(&((struct tm) { year, hospedagem.checkOutMes - 1, hospedagem.checkOutDia, 0, 0, 0, 0, 0, 0 }));
+                    if (checkOut > checkIn) {
+                        duracao = difftime(checkOut, checkIn) / (60 * 60 * 24); // Calcula a diferença de tempo em dias
+                    }
+                    else {
+                        duracao = 0; // Defina uma duração padrão ou trate a situação de datas inválidas conforme necessário
+                    }
 
-            // Atualiza o status da hospedagem para "Finalizada"
-            strcpy(hospedagem.status, "Finalizada");
+                    // Calcula o valor total da hospedagem com base no preço do quarto
+                    hospedagem.valorTotal = duracao * quarto.precoDiaria;
 
-            // Volta para a posição inicial no arquivo para realizar as atualizações
-            fseek(arquivoHospedagens, -1 * sizeof(hospedagem), SEEK_CUR);
+                    // Armazena a data de check-out
+                    time_t rawtime;
+                    time(&rawtime);
+                    struct tm* checkout = localtime(&rawtime);
+                    hospedagem.checkOutDia = checkout->tm_mday;
+                    hospedagem.checkOutMes = checkout->tm_mon + 1;
+                    hospedagem.checkOutAno = checkout->tm_year + 1900;
 
-            // Escreve as atualizações no arquivo
-            fprintf(arquivoHospedagens, "%d;%s;%d;%d;%d;%d;%d;%d;%s;%.2lf\n",
-                hospedagem.identificacaoReserva, hospedagem.cpfCliente,
-                hospedagem.checkInDia, hospedagem.checkInMes, hospedagem.checkInAno,
-                hospedagem.checkOutDia, hospedagem.checkOutMes, hospedagem.checkOutAno,
-                hospedagem.status, hospedagem.valorTotal);
+                    // Atualiza o status da hospedagem para "Finalizada"
+                    strcpy(hospedagem.status, "Finalizada");
 
-            // Exibe mensagem de sucesso
-            printf("Hospedagem finalizada com sucesso!\n");
+                 
+                    // Escreve as atualizações no arquivo
+                    fprintf(arquivoHospedagens, "%d;%s;%d;%d;%d;%d;%d;%d;%s;%.2lf\n",
+                        hospedagem.identificacaoReserva, hospedagem.cpfCliente,
+                        hospedagem.checkInDia, hospedagem.checkInMes, hospedagem.checkInAno,
+                        hospedagem.checkOutDia, hospedagem.checkOutMes, hospedagem.checkOutAno,
+                        hospedagem.status, hospedagem.valorTotal);
+
+                    // Exibe mensagem de sucesso
+                 
+                    limparTela();
+                    imprimirTextoCercado("Hospedagem finalizada com sucesso!", strlen("Hospedagem finalizada com sucesso!"));
+
+
+                    break;
+                }
+            }
+            fclose(arquivoQuartos);
         }
     }
 
@@ -154,10 +197,10 @@ void mostrarHospedagensPorCliente(char cpfCliente[14]) {
     FILE* arquivoHospedagens;
     Hospedagem hospedagem;
 
-    arquivoHospedagens = fopen("Hospedagens.txt", "r");
+    arquivoHospedagens = fopen("Hospedagens.csv", "r");
 
     if (arquivoHospedagens == NULL) {
-        printf("Erro ao abrir o arquivo Hospedagens.txt\n");
+        printf("Erro ao abrir o arquivo Hospedagens.csv\n");
         return;
     }
 

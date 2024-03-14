@@ -10,6 +10,7 @@ int validarInputInteiro(char mensagem[]);
 // Função para verificar se um CPF existe em um arquivo
 int cpfExiste(const char* cpf, FILE* arquivo);
 
+void imprimirTextoCercado(char texto[], int tamanho);
 
 //Função para limpar o console
 void limparTela();

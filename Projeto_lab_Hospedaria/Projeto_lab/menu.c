@@ -1,20 +1,16 @@
-
-
 #include <stdio.h>
 #include "menu.h"
-
 #include "validarInput.h"
 #include "cliente.h"
 #include "reserva.h"
 #include "hospedagem.h"
 #include "quarto.h"
 
-
-
+// Função para exibir o menu principal e obter a opção escolhida pelo usuário
 int exibirMenu() {
     int opcao;
 
-    printf("\n=== Sistema de Gerenciamento Hoteleiro ===\n");
+    imprimirTextoCercado("Sistema de Gerenciamento Hoteleiro", strlen("Sistema de Gerenciamento Hoteleiro"));
     printf("1: Quartos\n");
     printf("2: Clientes\n");
     printf("3: Reservas\n");
@@ -27,10 +23,14 @@ int exibirMenu() {
     return opcao;
 }
 
+// Função para executar a opção escolhida pelo usuário
 void executarOpcao(int opcao) {
+    char cpf[14]; // Variável para armazenar o CPF do cliente
+    limparTela();
+
     switch (opcao) {
     case 1:
-        printf("\n======== Opcao 1 selecionada: Quartos ========\n");
+        imprimirTextoCercado("Opcao 1 selecionada: Quartos", strlen("Opcao 1 selecionada: Quartos"));
         printf("1: Novo Quarto\n");
         printf("2: Excluir Quarto\n");
         printf("3: Alterar Quarto\n");
@@ -42,21 +42,15 @@ void executarOpcao(int opcao) {
             cadastrarQuartos();
             break;
         case 2:
-        {
-            int identificacao;
             printf("Digite a identificacao do quarto que deseja excluir: ");
-            scanf("%d", &identificacao);
-            excluirQuarto(identificacao);
-        }
-        break;
+            scanf("%d", &opcao);
+            excluirQuarto(opcao);
+            break;
         case 3:
-        {
-            int identificacao;
             printf("Digite a identificacao do quarto que deseja alterar: ");
-            scanf("%d", &identificacao);
-            alterarQuarto(identificacao);
-        }
-        break;
+            scanf("%d", &opcao);
+            alterarQuarto(opcao);
+            break;
         case 4:
             break;
         default:
@@ -66,14 +60,13 @@ void executarOpcao(int opcao) {
         break;
 
     case 2:
-        printf("\n======== Opcao 2 selecionada: Cadastro de clientes ========\n");
+        imprimirTextoCercado("Opcao 2 selecionada: Cadastro de clientes", strlen("Opcao 2 selecionada: Cadastro de clientes"));
         printf("1: Novo Cliente\n");
         printf("2: Alterar Cliente\n");
         printf("3: Remover Cliente\n");
         printf("4: Sair (Voltar ao menu principal)\n");
         printf("Escolha uma opcao (1-4): ");
         opcao = validarInputInteiro("");
-        char cpf[14];
         switch (opcao) {
         case 1:
             cadastrarClientes();
@@ -91,13 +84,13 @@ void executarOpcao(int opcao) {
         case 4:
             break;
         default:
-            printf("Opcao inválida. Por favor, escolha uma opcao válida.\n");
+            printf("Opcao invalida. Por favor, escolha uma opcao válida.\n");
             break;
         }
         break;
 
     case 3:
-        printf("\n======== Opcao 3 selecionada: Reservas ========\n");
+        imprimirTextoCercado("Opcao 3 selecionada: Reservas", strlen("Opcao 3 selecionada: Reservas"));
         printf("1: Reservar quarto\n");
         printf("2: Cancelar reserva\n");
         printf("3: Buscar Reserva\n");
@@ -119,13 +112,13 @@ void executarOpcao(int opcao) {
             verificarDisponibilidade();
             break;
         default:
-            printf("Opcao inválida. Por favor, escolha uma opcao válida.\n");
+            printf("Opcao invalida. Por favor, escolha uma opcao válida.\n");
             break;
         }
         break;
 
     case 4:
-        printf("\n======== Opcao 4 selecionada: Hospedagens ========\n");
+        imprimirTextoCercado("Opcao 4 selecionada: Hospedagens", strlen("Opcao 4 selecionada: Hospedagens"));
         printf("1: Check-in de cliente\n");
         printf("2: Check-out de cliente\n");
         printf("3: Buscar hospedagem do cliente\n");
@@ -142,7 +135,7 @@ void executarOpcao(int opcao) {
             break;
 
         case 2:
-            // Solicitar o código da reserva para finalizar a hospedagem
+            //// Solicitar o código da reserva para finalizar a hospedagem
             printf("Digite o codigo da reserva para finalizar a hospedagem: ");
             int codigoReservaCheckOut;
             scanf("%d", &codigoReservaCheckOut);
@@ -159,18 +152,18 @@ void executarOpcao(int opcao) {
         case 4:
             break;
         default:
-            printf("Opcao inválida. Por favor, escolha uma opcao válida.\n");
+            printf("Opcao invalida. Por favor, escolha uma opcao válida.\n");
             break;
         }
         break;
 
+
     case 5:
-        printf("\nSaindo do programa. Ate logo!\n");
+        imprimirTextoCercado("Saindo do programa. Ate logo!", strlen("Saindo do programa. Ate logo!"));
         break;
 
     default:
-        printf("\nOpcao inválida. Por favor, escolha uma opcao valida.\n");
+        printf("Opcao invalida. Por favor, escolha uma opcao valida.\n");
         break;
     }
 }
-

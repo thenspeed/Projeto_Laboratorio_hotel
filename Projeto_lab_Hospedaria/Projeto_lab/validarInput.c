@@ -1,8 +1,8 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "validarInput.h"
 
+// Função para validar a entrada de um número inteiro
 int validarInputInteiro(char mensagem[]) {
     int valor;
 
@@ -20,6 +20,7 @@ int validarInputInteiro(char mensagem[]) {
     return valor;
 }
 
+// Função para verificar se um CPF existe em um arquivo
 int cpfExiste(const char* cpf, FILE* arquivo) {
     char buffer[256];
     while (fgets(buffer, sizeof(buffer), arquivo) != NULL) {
@@ -32,6 +33,30 @@ int cpfExiste(const char* cpf, FILE* arquivo) {
     return 0; // CPF não encontrado
 }
 
+// Função para imprimir um texto cercado por caracteres '+'
+void imprimirTextoCercado(char texto[], int tamanho) {
+   
+    printf(" \n");
+    for (int i = 0; i < tamanho + 4; i++) {
+        printf("+");
+    }
+    printf("\n");
+
+    // Imprime o texto cercado por caracteres '+'
+    printf("+ ");
+    printf("%s", texto);
+    printf(" +\n");
+
+
+    // Imprime linha inferior de caracteres '+'
+    for (int i = 0; i < tamanho + 4; i++) {
+        printf("+");
+    }
+    printf("\n");
+    printf(" \n");
+}
+
+// Função para limpar a tela do console
 void limparTela() {
 #ifdef _WIN32
     system("cls");

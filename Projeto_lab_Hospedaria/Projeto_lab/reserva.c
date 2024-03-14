@@ -21,16 +21,111 @@ typedef struct {
     char status;
 } Quarto;
 
-typedef struct {
-    int identificacaoReserva;
-    char cpfCliente[14];
-    int checkInDia, checkInMes, checkInAno;
-    int checkOutDia, checkOutMes, checkOutAno;
-    char tipoQuarto[20];
-    int identificacaoQuarto;
-} Reserva;
 
 
+// Função para cancelar reserva por código
+void cancelarReservaPorCodigo(int codigoReserva) {
+    FILE* arquivoReservas;
+    FILE* temp;
+    Reserva reserva;
+
+    arquivoReservas = fopen("Reservas.csv", "r");
+    temp = fopen("temp.csv", "w");
+
+    if (arquivoReservas == NULL || temp == NULL) {
+        printf("Erro ao abrir os arquivos Reservas.csv ou temp.csv\n");
+        return;
+    }
+
+    int reservaEncontrada = 0;
+
+    // Percorre as reservas e copia para o arquivo temporário, excluindo a desejada
+    while (fscanf(arquivoReservas, "%d;%[^;];%d;%d;%d;%d;%d;%d;%[^;];%d\n",
+        &reserva.identificacaoReserva, reserva.cpfCliente,
+        &reserva.checkInDia, &reserva.checkInMes, &reserva.checkInAno,
+        &reserva.checkOutDia, &reserva.checkOutMes, &reserva.checkOutAno,
+        reserva.tipoQuarto, &reserva.identificacaoQuarto) == 10) {
+
+        if (reserva.identificacaoReserva == codigoReserva) {
+            reservaEncontrada = 1;
+
+            limparTela();
+            imprimirTextoCercado("Reserva encontrada e cancelada com sucesso.", strlen("Reserva encontrada e cancelada com sucesso."));
+
+        }
+        else {
+            fprintf(temp, "%d;%s;%d;%d;%d;%d;%d;%d;%s;%d\n",
+                reserva.identificacaoReserva, reserva.cpfCliente,
+                reserva.checkInDia, reserva.checkInMes, reserva.checkInAno,
+                reserva.checkOutDia, reserva.checkOutMes, reserva.checkOutAno,
+                reserva.tipoQuarto, reserva.identificacaoQuarto);
+        }
+    }
+
+    // Substitui o arquivo original pelo temporário
+    fclose(arquivoReservas);
+    fclose(temp);
+    remove("Reservas.csv");
+    rename("temp.csv", "Reservas.csv");
+
+    if (!reservaEncontrada) {
+        printf("Reserva nao encontrada com o codigo %d.\n", codigoReserva);
+    }
+}
+
+// Função para cancelar reserva por CPF e data de check-in
+void cancelarReservaPorCPF(char cpfCliente[14], int checkInDia, int checkInMes, int checkInAno) {
+    FILE* arquivoReservas;
+    FILE* temp;
+    Reserva reserva;
+
+    arquivoReservas = fopen("Reservas.csv", "r");
+    temp = fopen("temp.csv", "w");
+
+    if (arquivoReservas == NULL || temp == NULL) {
+        printf("Erro ao abrir os arquivos Reservas.csv ou temp.csv\n");
+        return;
+    }
+
+    int reservaEncontrada = 0;
+
+    // Percorre as reservas e copia para o arquivo temporário, excluindo a desejada
+    while (fscanf(arquivoReservas, "%d;%[^;];%d;%d;%d;%d;%d;%d;%[^;];%d\n",
+        &reserva.identificacaoReserva, reserva.cpfCliente,
+        &reserva.checkInDia, &reserva.checkInMes, &reserva.checkInAno,
+        &reserva.checkOutDia, &reserva.checkOutMes, &reserva.checkOutAno,
+        reserva.tipoQuarto, &reserva.identificacaoQuarto) == 10) {
+
+        if (strcmp(reserva.cpfCliente, cpfCliente) == 0 &&
+            reserva.checkInDia == checkInDia &&
+            reserva.checkInMes == checkInMes &&
+            reserva.checkInAno == checkInAno) {
+            reservaEncontrada = 1;
+            printf("\n");
+
+            limparTela();
+            imprimirTextoCercado("Reserva encontrada e cancelada com sucesso.!!", strlen("Reserva encontrada e cancelada com sucesso.!!"));
+
+        }
+        else {
+            fprintf(temp, "%d;%s;%d;%d;%d;%d;%d;%d;%s;%d\n",
+                reserva.identificacaoReserva, reserva.cpfCliente,
+                reserva.checkInDia, reserva.checkInMes, reserva.checkInAno,
+                reserva.checkOutDia, reserva.checkOutMes, reserva.checkOutAno,
+                reserva.tipoQuarto, reserva.identificacaoQuarto);
+        }
+    }
+
+    // Substitui o arquivo original pelo temporário
+    fclose(arquivoReservas);
+    fclose(temp);
+    remove("Reservas.csv");
+    rename("temp.csv", "Reservas.csv");
+
+    if (!reservaEncontrada) {
+        printf("Reserva nao encontrada para o CPF %s e data de check-in %d/%d/%d.\n", cpfCliente, checkInDia, checkInMes, checkInAno);
+    }
+}
 
 
 // Função para cadastrar reservas
@@ -38,13 +133,13 @@ int cadastrarReserva() {
     FILE* arquivo;
     Reserva reserva;
 
-    arquivo = fopen("Reservas.txt", "a");
+    arquivo = fopen("Reservas.csv", "a");
 
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo Reservas.txt\n");
+        printf("Erro ao abrir o arquivo Reservas.csv\n");
         return 0;
     }
-
+    printf(" \n");
     printf("Identificacao da reserva (maior que 0): ");
     scanf("%d", &reserva.identificacaoReserva);
 
@@ -61,11 +156,21 @@ int cadastrarReserva() {
     // Validando CPF
     // Implemente a validação do CPF conforme necessário
 
-    printf("Data de Check-in (dia mes ano): ");
-    scanf("%d %d %d", &reserva.checkInDia, &reserva.checkInMes, &reserva.checkInAno);
+    printf("Data de Check-in:\n");
+    printf("Dia: ");
+    scanf("%d", &reserva.checkInDia);
+    printf("Mes: ");
+    scanf("%d", &reserva.checkInMes);
+    printf("Ano: ");
+    scanf("%d", &reserva.checkInAno);
 
-    printf("Data de Check-out (dia mes ano): ");
-    scanf("%d %d %d", &reserva.checkOutDia, &reserva.checkOutMes, &reserva.checkOutAno);
+    printf("\nData de Check-out:\n");
+    printf("Dia: ");
+    scanf("%d", &reserva.checkOutDia);
+    printf("Mes: ");
+    scanf("%d", &reserva.checkOutMes);
+    printf("Ano: ");
+    scanf("%d", &reserva.checkOutAno);
 
     printf("Tipo de quarto (Single, Duplo, Triplo): ");
     scanf("%s", reserva.tipoQuarto);
@@ -84,7 +189,7 @@ int cadastrarReserva() {
     fclose(arquivo);
 
     limparTela();
-    printf("Cadastro da reserva concluido!\n");
+    imprimirTextoCercado("Cadastro da reserva concluido!", strlen("Cadastro da reserva concluido!"));
 
     return 1;
 }
@@ -95,13 +200,13 @@ void consultarReservasPorCPF() {
     char cpfConsulta[14];
     Reserva reserva;
 
-    arquivo = fopen("Reservas.txt", "r");
+    arquivo = fopen("Reservas.csv", "r");
 
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo Reservas.txt\n");
+        printf("Erro ao abrir o arquivo Reservas.csv\n");
         return;
     }
-
+    printf(" \n");
     printf("Digite o CPF do cliente para consultar as reservas: ");
     scanf("%13s", cpfConsulta);
 
@@ -134,7 +239,7 @@ void excluirReserva() {
     printf("2: Pelo CPF do cliente e data de check-in\n");
     printf("Escolha uma opcao (1-2): ");
     scanf("%d", &opcaoCancelamento);
-
+    printf(" \n");
     if (opcaoCancelamento == 1) {
         int codigoReserva;
         printf("Digite o codigo da reserva: ");
@@ -169,14 +274,14 @@ void verificarDisponibilidade() {
     Quarto quarto;
     Reserva reserva;
 
-    arquivoQuartos = fopen("Quartos.txt", "r");
-    arquivoReservas = fopen("Reservas.txt", "r");
+    arquivoQuartos = fopen("Quartos.csv", "r");
+    arquivoReservas = fopen("Reservas.csv", "r");
 
     if (arquivoQuartos == NULL || arquivoReservas == NULL) {
-        printf("Erro ao abrir os arquivos Quartos.txt ou Reservas.txt\n");
+        printf("Erro ao abrir os arquivos Quartos.csv ou Reservas.csv\n");
         return;
     }
-
+    printf(" \n");
     // Coleta os dados para a verificação de disponibilidade
     char tipoQuarto[20];
     int checkInDia, checkInMes, checkInAno;
@@ -185,11 +290,23 @@ void verificarDisponibilidade() {
     printf("Digite o tipo de quarto desejado (Single, Duplo, Triplo): ");
     scanf("%s", tipoQuarto);
 
-    printf("Digite a data de check-in (dia mes ano): ");
-    scanf("%d %d %d", &checkInDia, &checkInMes, &checkInAno);
+    printf("Data de Check-in:\n");
+    printf("Dia: ");
+    scanf("%d", &checkInDia);
+    printf("Mes: ");
+    scanf("%d", &checkInMes);
+    printf("Ano: ");
+    scanf("%d", &checkInAno);
 
-    printf("Digite a data de check-out (dia mes ano): ");
-    scanf("%d %d %d", &checkOutDia, &checkOutMes, &checkOutAno);
+    printf("\nData de Check-out:\n");
+    printf("Dia: ");
+    scanf("%d", &checkOutDia);
+    printf("Mes: ");
+    scanf("%d", &checkOutMes);
+    printf("Ano: ");
+    scanf("%d", &checkOutAno);
+
+
 
     // Exibir cabeçalho da tabela
     printf("\nIdentificacao | Tipo | Preco Diaria | Status\n");
@@ -232,104 +349,4 @@ void verificarDisponibilidade() {
 
     fclose(arquivoQuartos);
     fclose(arquivoReservas);
-}
-
-
-
-
-// Função para cancelar reserva por código
-void cancelarReservaPorCodigo(int codigoReserva) {
-    FILE* arquivoReservas;
-    FILE* temp;
-    Reserva reserva;
-
-    arquivoReservas = fopen("Reservas.txt", "r");
-    temp = fopen("temp.txt", "w");
-
-    if (arquivoReservas == NULL || temp == NULL) {
-        printf("Erro ao abrir os arquivos Reservas.txt ou temp.txt\n");
-        return;
-    }
-
-    int reservaEncontrada = 0;
-
-    // Percorre as reservas e copia para o arquivo temporário, excluindo a desejada
-    while (fscanf(arquivoReservas, "%d;%[^;];%d;%d;%d;%d;%d;%d;%[^;];%d\n",
-        &reserva.identificacaoReserva, reserva.cpfCliente,
-        &reserva.checkInDia, &reserva.checkInMes, &reserva.checkInAno,
-        &reserva.checkOutDia, &reserva.checkOutMes, &reserva.checkOutAno,
-        reserva.tipoQuarto, &reserva.identificacaoQuarto) == 10) {
-
-        if (reserva.identificacaoReserva == codigoReserva) {
-            reservaEncontrada = 1;
-            printf("Reserva encontrada e cancelada com sucesso.\n");
-        }
-        else {
-            fprintf(temp, "%d;%s;%d;%d;%d;%d;%d;%d;%s;%d\n",
-                reserva.identificacaoReserva, reserva.cpfCliente,
-                reserva.checkInDia, reserva.checkInMes, reserva.checkInAno,
-                reserva.checkOutDia, reserva.checkOutMes, reserva.checkOutAno,
-                reserva.tipoQuarto, reserva.identificacaoQuarto);
-        }
-    }
-
-    // Substitui o arquivo original pelo temporário
-    fclose(arquivoReservas);
-    fclose(temp);
-    remove("Reservas.txt");
-    rename("temp.txt", "Reservas.txt");
-
-    if (!reservaEncontrada) {
-        printf("Reserva nao encontrada com o codigo %d.\n", codigoReserva);
-    }
-}
-
-// Função para cancelar reserva por CPF e data de check-in
-void cancelarReservaPorCPF(char cpfCliente[14], int checkInDia, int checkInMes, int checkInAno) {
-    FILE* arquivoReservas;
-    FILE* temp;
-    Reserva reserva;
-
-    arquivoReservas = fopen("Reservas.txt", "r");
-    temp = fopen("temp.txt", "w");
-
-    if (arquivoReservas == NULL || temp == NULL) {
-        printf("Erro ao abrir os arquivos Reservas.txt ou temp.txt\n");
-        return;
-    }
-
-    int reservaEncontrada = 0;
-
-    // Percorre as reservas e copia para o arquivo temporário, excluindo a desejada
-    while (fscanf(arquivoReservas, "%d;%[^;];%d;%d;%d;%d;%d;%d;%[^;];%d\n",
-        &reserva.identificacaoReserva, reserva.cpfCliente,
-        &reserva.checkInDia, &reserva.checkInMes, &reserva.checkInAno,
-        &reserva.checkOutDia, &reserva.checkOutMes, &reserva.checkOutAno,
-        reserva.tipoQuarto, &reserva.identificacaoQuarto) == 10) {
-
-        if (strcmp(reserva.cpfCliente, cpfCliente) == 0 &&
-            reserva.checkInDia == checkInDia &&
-            reserva.checkInMes == checkInMes &&
-            reserva.checkInAno == checkInAno) {
-            reservaEncontrada = 1;
-            printf("Reserva encontrada e cancelada com sucesso.\n");
-        }
-        else {
-            fprintf(temp, "%d;%s;%d;%d;%d;%d;%d;%d;%s;%d\n",
-                reserva.identificacaoReserva, reserva.cpfCliente,
-                reserva.checkInDia, reserva.checkInMes, reserva.checkInAno,
-                reserva.checkOutDia, reserva.checkOutMes, reserva.checkOutAno,
-                reserva.tipoQuarto, reserva.identificacaoQuarto);
-        }
-    }
-
-    // Substitui o arquivo original pelo temporário
-    fclose(arquivoReservas);
-    fclose(temp);
-    remove("Reservas.txt");
-    rename("temp.txt", "Reservas.txt");
-
-    if (!reservaEncontrada) {
-        printf("Reserva nao encontrada para o CPF %s e data de check-in %d/%d/%d.\n", cpfCliente, checkInDia, checkInMes, checkInAno);
-    }
 }

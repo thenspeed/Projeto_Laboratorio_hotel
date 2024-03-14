@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "quarto.h"
-
 #include "validarInput.h"
-
 
 // Função para cadastrar quartos
 int cadastrarQuartos() {
@@ -12,13 +10,14 @@ int cadastrarQuartos() {
     char tipoQuarto[20], status;
     double precoDiaria;
 
-    arquivo = fopen("Quartos.txt", "a");
+    arquivo = fopen("Quartos.csv", "a");
 
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo Quartos.txt\n");
+        printf("Erro ao abrir o arquivo Quartos.csv\n");
         return 0;
     }
 
+    printf(" \n");
     printf("Identificacao do quarto (maior que 100): ");
     scanf("%d", &identificacao);
 
@@ -65,7 +64,7 @@ int cadastrarQuartos() {
     fclose(arquivo);
 
     limparTela();
-    printf("Cadastro do quarto concluido!\n");
+    imprimirTextoCercado("Cadastro do quarto concluido!", strlen("Cadastro do quarto concluido!"));
 
     return 1;
 }
@@ -76,11 +75,11 @@ int excluirQuarto(int identificacao) {
     FILE* temp;
     char linha[256];
 
-    arquivo = fopen("Quartos.txt", "r");
-    temp = fopen("temp.txt", "w");
+    arquivo = fopen("Quartos.csv", "r");
+    temp = fopen("temp.csv", "w");
 
     if (arquivo == NULL || temp == NULL) {
-        printf("Erro ao abrir o arquivo Quartos.txt ou temp.txt\n");
+        printf("Erro ao abrir o arquivo Quartos.csv ou temp.csv\n");
         return 0;
     }
 
@@ -95,11 +94,11 @@ int excluirQuarto(int identificacao) {
     fclose(arquivo);
     fclose(temp);
 
-    remove("Quartos.txt");
-    rename("temp.txt", "Quartos.txt");
+    remove("Quartos.csv");
+    rename("temp.csv", "Quartos.csv");
 
     limparTela();
-    printf("Quarto excluido com sucesso!\n");
+    imprimirTextoCercado("Quarto excluido com sucesso!", strlen("Quarto excluido com sucesso!"));
 
     return 1;
 }
@@ -113,14 +112,15 @@ int alterarQuarto(int identificacao) {
     char tipoQuarto[20], status;
     double precoDiaria;
 
-    arquivo = fopen("Quartos.txt", "r");
-    temp = fopen("temp.txt", "w");
+    arquivo = fopen("Quartos.csv", "r");
+    temp = fopen("temp.csv", "w");
 
     if (arquivo == NULL || temp == NULL) {
-        printf("Erro ao abrir o arquivo Quartos.txt ou temp.txt\n");
+        printf("Erro ao abrir o arquivo Quartos.csv ou temp.csv\n");
         return 0;
     }
-
+    
+    printf(" \n");
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
         int id;
         sscanf(linha, "%d", &id);
@@ -164,11 +164,11 @@ int alterarQuarto(int identificacao) {
     fclose(arquivo);
     fclose(temp);
 
-    remove("Quartos.txt");
-    rename("temp.txt", "Quartos.txt");
+    remove("Quartos.csv");
+    rename("temp.csv", "Quartos.csv");
 
     limparTela();
-    printf("Quarto alterado com sucesso!\n");
+    imprimirTextoCercado("Quarto alterado com sucesso!", strlen("Quarto alterado com sucesso!"));
 
     return 1;
 }
